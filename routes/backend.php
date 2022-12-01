@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Backend\AuthController;
+use App\Http\Controllers\Backend\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +15,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('backend.auth.login');
+Route::group([
+    'prefix' => 'backend',
+    'as' => 'backend.',
+    'middleware' => 'auth:backend',
+], function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('index');
+    Route::get('logout', function () {
+        auth()->logout();
+    })->name('logout');
+});
+
+
+
+Route::group([
+    'prefix' => 'backend',
+    'as' => 'backend.',
+    'middleware' => 'guest:backend',
+], function () {
+    Route::get('login', [AuthController::class, 'loginView'])->name('loginView');
+    Route::post('login', [AuthController::class, 'loginAuth'])->name('loginAuth');
 });
